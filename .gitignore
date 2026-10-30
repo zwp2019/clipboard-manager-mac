@@ -1,0 +1,17 @@
+# SwiftPM
+.build/
+.swiftpm/
+
+# 构建产物（脚本生成）
+build/
+
+# Xcode
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+DerivedData/
+
+# macOS
+.DS_Store
+
+# 本地配置
+*.local
