@@ -4,11 +4,13 @@ import SwiftUI
 /// Design Tokens：所有颜色集中管理，支持深浅色。
 enum Palette {
     static let cardSurface = dynamic(light: NSColor.white, dark: NSColor(srgbRed: 0.161, green: 0.165, blue: 0.184, alpha: 1))
-    /// 卡片表面渐变（上：更亮；下：略沉），做出纸张般的层次；带轻微透明，与画板玻璃融为一体
-    static let cardSurfaceTop = dynamic(light: NSColor.white.withAlphaComponent(0.96),
-                                        dark: NSColor(srgbRed: 0.184, green: 0.188, blue: 0.208, alpha: 0.94))
-    static let cardSurfaceBottom = dynamic(light: NSColor(srgbRed: 0.965, green: 0.969, blue: 0.980, alpha: 0.92),
-                                           dark: NSColor(srgbRed: 0.145, green: 0.149, blue: 0.169, alpha: 0.90))
+    /// 卡片表面渐变（上：更亮；下：略沉），做出纸张般的层次。
+    /// 必须完全不透明：卡片贴在毛玻璃上，任何透明度都会让底下的模糊壁纸透上来，
+    /// 字形边缘随之出现「雾化」感，看起来就是字体发虚。
+    static let cardSurfaceTop = dynamic(light: NSColor.white,
+                                        dark: NSColor(srgbRed: 0.184, green: 0.188, blue: 0.208, alpha: 1))
+    static let cardSurfaceBottom = dynamic(light: NSColor(srgbRed: 0.965, green: 0.969, blue: 0.980, alpha: 1),
+                                           dark: NSColor(srgbRed: 0.145, green: 0.149, blue: 0.169, alpha: 1))
     /// 画板玻璃：整体色调层（压出“烟熏玻璃”的质感，避免材质发灰发脏）
     static let glassTint = dynamic(light: NSColor.black.withAlphaComponent(0.05),
                                    dark: NSColor.black.withAlphaComponent(0.16))
@@ -88,7 +90,7 @@ enum Typography {
     static let title = Font.system(size: 20, weight: .semibold)
     static let body = Font.system(size: 13)
     static let secondary = Font.system(size: 12)
-    static let caption = Font.system(size: 10.5)
+    static let caption = Font.system(size: 11)
     static let mono = Font.system(size: 12, design: .monospaced)
 }
 

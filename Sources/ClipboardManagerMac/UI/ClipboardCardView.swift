@@ -17,6 +17,7 @@ struct ClipboardCardView: View {
     @State private var appIcon: NSImage?
 
     private let cardSize = LauncherMetrics.cardSize
+    private let cardShape = RoundedRectangle(cornerRadius: 16, style: .continuous)
 
     private var isColorItem: Bool {
         guard item.type == .text, let text = item.text?.trimmingCharacters(in: .whitespacesAndNewlines) else { return false }
@@ -24,7 +25,8 @@ struct ClipboardCardView: View {
     }
 
     private var previewFont: Font {
-        item.type == .code ? Typography.mono : Font.system(size: 12.5)
+        // 12.5pt 的常规中文在暗色卡片上笔画太细，观感会「发虚」，统一用 13pt 正文
+        item.type == .code ? Typography.mono : Typography.body
     }
 
     private var headerTextColor: Color {
@@ -61,16 +63,24 @@ struct ClipboardCardView: View {
             }
         }
         .frame(width: cardSize.width, height: cardSize.height)
-        .background(
-            LinearGradient(colors: [Palette.cardSurfaceTop, Palette.cardSurfaceBottom],
-                           startPoint: .top, endPoint: .bottom)
-        )
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        // 先裁切内容，再把带阴影的背景垫在后面。
+        // 若把 .shadow 加在整张卡上，SwiftUI 会把「包含文字」的整棵子树离屏栅格化后再投影，
+        // 字形在这一步被当作图片重新合成，边缘会明显发虚。
+        .clipShape(cardShape)
         .overlay(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .strokeBorder(isSelected ? Palette.accent : Palette.rim,
-                              lineWidth: isSelected ? 2 : 0.75)
+            cardShape.strokeBorder(isSelected ? Palette.accent : Palette.rim,
+                                   lineWidth: isSelected ? 2 : 0.75)
         )
+        // 只让描边做过渡动画；阴影放在动画之外，避免逐帧重算模糊导致卡顿
+        .animation(.easeOut(duration: 0.15), value: isSelected)
+        .background {
+            cardShape
+                .fill(LinearGradient(colors: [Palette.cardSurfaceTop, Palette.cardSurfaceBottom],
+                                     startPoint: .top, endPoint: .bottom))
+                .shadow(color: isSelected ? Palette.accent.opacity(0.26) : .black.opacity(0.10),
+                        radius: isSelected ? 10 : 7,
+                        y: isSelected ? 4 : 3)
+        }
         .overlay(alignment: .topLeading) {
             if item.isFavorite {
                 Image(systemName: "star.fill")
