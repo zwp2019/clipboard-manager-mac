@@ -1,5 +1,13 @@
 # 剪贴板管理器 for macOS
 
+> # Clipboard Manager for macOS
+>
+> A native macOS clipboard history manager. It lives in your menu bar, and a press of `⌘⇧V` opens a card-style board at the bottom of the screen where you can browse, search, favorite, and paste anything you've copied: text, links, images, code, files, and even color values.
+>
+> Built with Swift Package Manager, AppKit, and SwiftUI. No third-party dependencies. Requires macOS 14+.
+>
+> 推广素材见 [docs/promotion.md](docs/promotion.md)。
+
 一款原生 macOS 剪贴板历史管理工具。常驻菜单栏，一键呼出屏幕底部的「画板」，以卡片流的形式浏览、搜索、收藏和回贴最近复制过的所有内容——文本、链接、图片、代码、文件，乃至一张颜色色值，都能找回。
 
 基于 **Swift Package Manager + AppKit + SwiftUI** 构建，无第三方依赖，使用系统 Vision 框架完成图片 OCR。
