@@ -1,4 +1,5 @@
 import AppKit
+import Combine
 import SwiftUI
 
 private enum SettingsCategory: String, CaseIterable, Identifiable {
@@ -40,6 +41,9 @@ struct SettingsView: View {
     @State private var excludedInput = ""
     @State private var historyCount = 0
     @State private var databaseSize = "—"
+    /// 辅助功能授权状态：每 1s 轮询一次，用户在系统设置里开关后无需重启即可刷新。
+    @State private var accessibilityTrusted = Paster.isTrusted()
+    private let trustTicker = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     var body: some View {
         HStack(spacing: 0) {
@@ -59,7 +63,14 @@ struct SettingsView: View {
         }
         .frame(minWidth: 720, minHeight: 520)
         .background(Color(nsColor: .windowBackgroundColor))
-        .onAppear(perform: refreshStats)
+        .onAppear {
+            refreshStats()
+            accessibilityTrusted = Paster.isTrusted()
+        }
+        .onReceive(trustTicker) { _ in
+            let trusted = Paster.isTrusted()
+            if trusted != accessibilityTrusted { accessibilityTrusted = trusted }
+        }
     }
 
     private var sidebar: some View {
@@ -122,12 +133,32 @@ struct SettingsView: View {
             }
             SettingsRow(title: "允许自动粘贴", subtitle: "需要在“系统设置 › 隐私与安全性 › 辅助功能”中授权。") {
                 HStack(spacing: 8) {
-                    Text(Paster.isTrusted() ? "已授权" : "未授权")
+                    Text(accessibilityTrusted ? "已授权" : "未授权")
                         .font(Typography.caption)
-                        .foregroundStyle(Paster.isTrusted() ? Palette.textSecondary : Palette.danger)
-                    Button("去授权") { openAccessibilitySettings() }
+                        .foregroundStyle(accessibilityTrusted ? Palette.textSecondary : Palette.danger)
+                    Button("去授权") { requestAccessibilityPermission() }
                         .buttonStyle(PillButtonStyle())
                 }
+            }
+            if !accessibilityTrusted {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack(alignment: .top, spacing: 6) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .font(.system(size: 11))
+                            .foregroundStyle(Palette.danger)
+                        Text("如果辅助功能列表里的开关已经打开，这里仍显示“未授权”，说明这条授权记录属于之前的构建版本、已经失效：请在列表中选中“剪贴板管理器”，点左下角“−”移除，再用“+”重新添加当前这个 App，然后重启应用。")
+                            .font(Typography.caption)
+                            .foregroundStyle(Palette.textSecondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    Button("重新启动应用") { restartApp() }
+                        .buttonStyle(PillButtonStyle())
+                }
+                .padding(10)
+                .background(
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(Palette.control.opacity(0.6))
+                )
             }
             SettingsRow(title: "复制后行为", subtitle: "开启后，选择条目将默认只复制纯文本。") {
                 Toggle("", isOn: Binding(
@@ -480,6 +511,26 @@ struct SettingsView: View {
     private func openAccessibilitySettings() {
         if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
             NSWorkspace.shared.open(url)
+        }
+    }
+
+    /// 先走系统授权提示：只有调用这个 API，当前这个构建版本才会被正式登记进辅助功能列表，
+    /// 手动打开系统设置再拨开关，很容易拨到旧构建残留的那条失效记录上。
+    private func requestAccessibilityPermission() {
+        _ = Paster.isTrusted(prompt: true)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { [self] in
+            let trusted = Paster.isTrusted()
+            accessibilityTrusted = trusted
+            if !trusted { openAccessibilitySettings() }
+        }
+    }
+
+    /// 授权状态只在进程启动时读取一次，改动后需要重启进程才会生效。
+    private func restartApp() {
+        let configuration = NSWorkspace.OpenConfiguration()
+        configuration.createsNewApplicationInstance = true
+        NSWorkspace.shared.openApplication(at: Bundle.main.bundleURL, configuration: configuration) { _, _ in
+            DispatchQueue.main.async { NSApp.terminate(nil) }
         }
     }
 }
