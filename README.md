@@ -1,6 +1,27 @@
-# 剪贴板管理器 for macOS
+<p align="center">
+  <b>简体中文</b> | <a href="README.en.md">English</a>
+</p>
 
-一款原生 macOS 剪贴板历史管理工具。常驻菜单栏，一键呼出屏幕底部的「画板」，以卡片流的形式浏览、搜索、收藏和回贴最近复制过的所有内容——文本、链接、图片、代码、文件，乃至一张颜色色值，都能找回。
+<h1 align="center">📋 剪贴板管理器 for macOS</h1>
+
+<p align="center">
+  原生 macOS 剪贴板历史管理工具
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/platform-macOS%2014%2B-blue" alt="platform">
+  <img src="https://img.shields.io/badge/Swift-SwiftUI%20%2B%20AppKit-orange" alt="swift">
+  <img src="https://img.shields.io/badge/dependencies-none-brightgreen" alt="no dependencies">
+  <img src="https://img.shields.io/badge/network-offline-success" alt="offline">
+</p>
+
+<p align="center">
+  <img src="docs/screenshot-overview.png" alt="画板界面截图" width="90%">
+</p>
+
+按 `⌘⇧V` 在屏幕底部呼出「画板」，以卡片流浏览、搜索、收藏和回贴最近复制过的所有内容——文本、链接、图片、代码、文件，乃至一张颜色色值，都能找回。
+
+推广素材见 [docs/promotion.md](docs/promotion.md)。常驻菜单栏，一键呼出屏幕底部的「画板」，以卡片流的形式浏览、搜索、收藏和回贴最近复制过的所有内容——文本、链接、图片、代码、文件，乃至一张颜色色值，都能找回。
 
 基于 **Swift Package Manager + AppKit + SwiftUI** 构建，无第三方依赖，使用系统 Vision 框架完成图片 OCR。
 
