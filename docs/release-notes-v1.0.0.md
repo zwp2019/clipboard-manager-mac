@@ -34,11 +34,17 @@ macOS 14.0 or later, on Apple Silicon or Intel.
 
 1. 下载并解压 `ClipboardManager-macOS.zip`
 2. 将「剪贴板管理器.app」拖入「应用程序」文件夹
-3. 首次打开如提示无法验证开发者，请右键选择「打开」
+3. 首次打开如提示「无法验证开发者」，请右键选择「打开」。
+4. 如提示「已损坏，无法打开」，请在终端执行以下命令后再打开：
+
+   ```bash
+   xattr -dr com.apple.quarantine "/Applications/剪贴板管理器.app"
+   ```
 
 1. Download and unzip `ClipboardManager-macOS.zip`.
 2. Drag 「剪贴板管理器.app」 into the Applications folder.
-3. If macOS says the developer cannot be verified on first launch, right-click the app and choose Open.
+3. If macOS says the developer cannot be verified, right-click the app and choose Open.
+4. If macOS says the app is "damaged", run the command above in Terminal, then open the app.
 
 ## 注意 / Notes
 
